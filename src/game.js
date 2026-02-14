@@ -94,7 +94,7 @@ function renderScene() {
   sceneEl.innerHTML = '';
 
   // 背景画像
-  sceneEl.style.backgroundImage = `url(/img/rooms/${dir}.png)`;
+  sceneEl.style.backgroundImage = `url(${import.meta.env.BASE_URL}img/rooms/${dir}.png)`;
   sceneEl.style.backgroundColor = '#1a1a2e';
 
   // ホットスポット描画

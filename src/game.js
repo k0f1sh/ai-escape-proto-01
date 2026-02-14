@@ -187,12 +187,17 @@ function handleAction(action) {
     examineClock,
     examineDoor,
     examinePoster,
+    examineCardReader,
     examineDrawer,
     examineComputer,
+    examinePenHolder,
+    examinePapers,
     examineBookRed,
+    examineBookBlue,
     examinePlant,
     examineSafe,
     examineCabinet,
+    examineWindow,
   };
   if (actions[action]) actions[action]();
 }
@@ -332,6 +337,27 @@ function examineBookRed() {
   } else {
     showMessage('赤い本に挟まっていたメモ書き──\n「PCのパスワードはポスターに書いてある」');
   }
+}
+
+// --- フレーバーテキスト ---
+function examineCardReader() {
+  showMessage('ドアの横にカードリーダーがある。\nカードキーをかざす場所のようだ。');
+}
+
+function examinePenHolder() {
+  showMessage('ペン立て。ボールペンが数本入っている。\n特に変わったところはない。');
+}
+
+function examinePapers() {
+  showMessage('デスクに置かれた資料。\n数字やグラフがびっしり並んでいるが、\n脱出には関係なさそうだ。');
+}
+
+function examineBookBlue() {
+  showMessage('青い本。パラパラめくってみたが、\n特に手がかりはなさそうだ。');
+}
+
+function examineWindow() {
+  showMessage('窓だが、しっかりロックされていて開かない。\n外は暗くてよく見えない。');
 }
 
 // --- 方向切り替え ---

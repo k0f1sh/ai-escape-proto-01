@@ -14,10 +14,10 @@
     <div id="scene-container">
       <div id="scene"></div>
       <button id="arrow-left" class="arrow-btn" aria-label="左を向く">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <button id="arrow-right" class="arrow-btn" aria-label="右を向く">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
       </button>
       <div id="text-window">
         <span id="text-window-label"></span>
@@ -31,6 +31,13 @@
     <div id="inventory-bar">
       <div id="inventory-label">ITEMS</div>
       <div id="inventory-slots"></div>
+    </div>
+  </div>
+  <div id="item-modal" class="hidden">
+    <div id="item-modal-card">
+      <p id="item-modal-label">GET ITEM</p>
+      <div id="item-modal-emoji"></div>
+      <p id="item-modal-name"></p>
     </div>
   </div>
   <div id="ending-overlay" class="hidden">

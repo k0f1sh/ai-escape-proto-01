@@ -89,20 +89,18 @@ html, body {
 .hotspot {
   position: absolute;
   cursor: pointer;
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border: none;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.04);
-
+  background: transparent;
   transition: all 0.2s ease;
 }
 
 .hotspot:active {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .hotspot-hint {
+  display: none;
   position: absolute;
   bottom: 4px;
   left: 50%;
@@ -120,8 +118,8 @@ html, body {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 56px;
+  width: 52px;
+  height: 80px;
   background: rgba(0, 0, 0, 0.35);
 
   color: var(--text-secondary);
@@ -309,6 +307,65 @@ html, body {
   white-space: nowrap;
 }
 
+/* ---- アイテム入手モーダル ---- */
+#item-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+  animation: item-modal-in 0.3s ease;
+}
+
+#item-modal.hidden {
+  display: none;
+}
+
+@keyframes item-modal-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#item-modal-card {
+  text-align: center;
+  padding: 32px 40px;
+  animation: item-card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes item-card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+#item-modal-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+#item-modal-emoji {
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+#item-modal-name {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+}
+
 /* ---- エンディング ---- */
 #ending-overlay {
   position: fixed;
@@ -370,12 +427,6 @@ html, body {
 #ending-restart:active {
   background: var(--accent-hover);
   transform: scale(0.96);
-}
-
-/* ---- 仮背景オブジェクト ---- */
-.room-object {
-  position: absolute;
-  border-radius: 4px;
 }
 
 /* ---- safe area 対応 ---- */

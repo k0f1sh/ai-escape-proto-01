@@ -1,4 +1,4 @@
-import { directions, directionLabels, hotspots, roomObjects, items } from './data.js';
+import { directions, directionLabels, hotspots, items } from './data.js';
 
 // --- ゲーム状態 ---
 let state = createInitialState();
@@ -24,6 +24,9 @@ const arrowLeft = document.getElementById('arrow-left');
 const arrowRight = document.getElementById('arrow-right');
 const endingOverlay = document.getElementById('ending-overlay');
 const endingRestart = document.getElementById('ending-restart');
+const itemModal = document.getElementById('item-modal');
+const itemModalEmoji = document.getElementById('item-modal-emoji');
+const itemModalName = document.getElementById('item-modal-name');
 
 // --- 現在の入力コールバック ---
 let inputCallback = null;
@@ -68,33 +71,31 @@ twInput.addEventListener('keydown', (e) => {
   }
 });
 
+// --- 座標変換 ---
+// data.js の座標は「w=10, h=10 が正方形に見える」仮想グリッド。
+// 実際のコンテナのアスペクト比に合わせて h をピクセル換算で補正する。
+function getHeightRatio() {
+  const rect = sceneEl.getBoundingClientRect();
+  if (rect.height === 0) return 1;
+  return rect.width / rect.height;
+}
+
+function applyPosition(el, x, y, w, h) {
+  const r = getHeightRatio();
+  el.style.left = x + '%';
+  el.style.top = (y * r) + '%';
+  el.style.width = w + '%';
+  el.style.height = (h * r) + '%';
+}
+
 // --- シーン描画 ---
 function renderScene() {
   const dir = directions[state.dirIndex];
   sceneEl.innerHTML = '';
 
-  // 方向に応じた背景色（仮）
-  const bgColors = {
-    north: '#1a3355', east: '#2a3345', south: '#1a3a3a', west: '#2a2a45',
-  };
-  sceneEl.style.background = bgColors[dir];
-
-  // 仮のCSSオブジェクト描画
-  const objects = roomObjects[dir] || [];
-  for (const obj of objects) {
-    if (obj.id === 'drawer' && state.flags.drawerOpen) {
-      const el = createRoomObject({ ...obj, color: '#6a4c10', y: '68%' });
-      sceneEl.appendChild(el);
-      continue;
-    }
-    if (obj.id === 'door' && state.flags.doorOpen) {
-      const el = createRoomObject({ ...obj, color: '#1a1a2e' });
-      sceneEl.appendChild(el);
-      continue;
-    }
-    const el = createRoomObject(obj);
-    sceneEl.appendChild(el);
-  }
+  // 背景画像
+  sceneEl.style.backgroundImage = `url(/img/rooms/${dir}.png)`;
+  sceneEl.style.backgroundColor = '#1a1a2e';
 
   // ホットスポット描画
   const spots = hotspots[dir] || [];
@@ -102,10 +103,7 @@ function renderScene() {
     if (spot.condition && !spot.condition(state.flags)) continue;
     const el = document.createElement('div');
     el.className = 'hotspot';
-    el.style.left = spot.x;
-    el.style.top = spot.y;
-    el.style.width = spot.w;
-    el.style.height = spot.h;
+    applyPosition(el, spot.x, spot.y, spot.w, spot.h);
     el.addEventListener('click', () => handleAction(spot.action));
 
     const hint = document.createElement('span');
@@ -118,25 +116,6 @@ function renderScene() {
 
   // 方向ラベル更新
   textWindowLabel.textContent = directionLabels[dir];
-}
-
-function createRoomObject(obj) {
-  const el = document.createElement('div');
-  el.className = 'room-object';
-  el.style.left = obj.x;
-  el.style.top = obj.y;
-  el.style.width = obj.w;
-  el.style.height = obj.h;
-  el.style.background = obj.color;
-  if (obj.border) el.style.border = obj.border;
-  if (obj.borderRadius) el.style.borderRadius = obj.borderRadius;
-  if (obj.label) {
-    const lbl = document.createElement('span');
-    lbl.className = 'hotspot-hint';
-    lbl.textContent = obj.label;
-    el.appendChild(lbl);
-  }
-  return el;
 }
 
 // --- インベントリ描画 ---
@@ -184,8 +163,28 @@ function addItem(itemId) {
   if (!state.inventory.includes(itemId)) {
     state.inventory.push(itemId);
     renderInventory();
+    showItemModal(itemId);
   }
 }
+
+// --- アイテム入手モーダル ---
+let itemModalTimer = null;
+
+function showItemModal(itemId) {
+  const item = items[itemId];
+  itemModalEmoji.textContent = item.emoji;
+  itemModalName.textContent = item.name;
+  itemModal.classList.remove('hidden');
+  clearTimeout(itemModalTimer);
+  itemModalTimer = setTimeout(hideItemModal, 2000);
+}
+
+function hideItemModal() {
+  itemModal.classList.add('hidden');
+  clearTimeout(itemModalTimer);
+}
+
+itemModal.addEventListener('click', hideItemModal);
 
 // --- アクション処理 ---
 function handleAction(action) {
@@ -265,10 +264,10 @@ function examineComputer() {
 
 function examineClock() {
   if (state.flags.computerSolved) {
-    showMessage('壁掛け時計。\n針は 3時15分 で止まっている。\n……これがヒントか？');
+    showMessage('壁掛け時計。\n針は 3時00分 で止まっている。\n……これがヒントか？');
     state.flags.clockChecked = true;
   } else {
-    showMessage('壁掛け時計。3時15分で止まっている。');
+    showMessage('壁掛け時計。3時00分で止まっている。');
   }
 }
 
@@ -281,7 +280,7 @@ function examineSafe() {
     '金庫がある。\n4桁の暗証番号を入力しよう。',
     '0000',
     (val) => {
-      if (val === '0315') {
+      if (val === '0300') {
         state.flags.safeOpen = true;
         hideInput();
         addItem('screwdriver');

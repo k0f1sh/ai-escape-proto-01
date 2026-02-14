@@ -91,7 +91,6 @@ function renderScene() {
 
   // 背景画像
   sceneEl.style.backgroundImage = `url(${import.meta.env.BASE_URL}img/rooms/${dir}.webp)`;
-  sceneEl.style.backgroundColor = '#1a1a2e';
 
   // ホットスポット描画
   const spots = hotspots[dir] || [];

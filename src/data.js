@@ -18,21 +18,21 @@ export const directionLabels = {
 
 export const hotspots = {
   north: [
-    { id: 'clock', label: '時計', x: 75, y: 17, w: 20, h: 20, condition: null, action: 'examineClock' },
+    { id: 'clock', label: '時計', x: 75, y: 23, w: 20, h: 20, condition: null, action: 'examineClock' },
     { id: 'door', label: 'ドア', x: 14, y: 27, w: 47, h: 99, condition: null, action: 'examineDoor' },
-    { id: 'poster', label: 'ポスター', x: 0, y: 41, w: 9, h: 24, condition: null, action: 'examinePoster' },
+    { id: 'poster', label: 'ポスター', x: 0, y: 46, w: 9, h: 24, condition: null, action: 'examinePoster' },
   ],
   east: [
-    { id: 'drawer', label: '引き出し', x: 10, y: 100, w: 25, h: 15, condition: null, action: 'examineDrawer' },
-    { id: 'computer', label: 'PC', x: 38, y: 52, w: 42, h: 37, condition: null, action: 'examineComputer' },
+    { id: 'drawer', label: '引き出し', x: 10, y: 105, w: 25, h: 15, condition: null, action: 'examineDrawer' },
+    { id: 'computer', label: 'PC', x: 39, y: 58, w: 42, h: 37, condition: null, action: 'examineComputer' },
   ],
   south: [
-    { id: 'book-red', label: '赤い本', x: 8, y: 31, w: 5, h: 17, condition: null, action: 'examineBookRed' },
-    { id: 'plant', label: '観葉植物', x: 65, y: 61, w: 37, h: 71, condition: null, action: 'examinePlant' },
+    { id: 'book-red', label: '赤い本', x: 9, y: 37, w: 5, h: 17, condition: null, action: 'examineBookRed' },
+    { id: 'plant', label: '観葉植物', x: 65, y: 68, w: 37, h: 71, condition: null, action: 'examinePlant' },
   ],
   west: [
-    { id: 'safe', label: '金庫', x: 2, y: 89, w: 36, h: 44, condition: null, action: 'examineSafe' },
-    { id: 'cabinet', label: 'キャビネット', x: 68, y: 31, w: 34, h: 102, condition: null, action: 'examineCabinet' },
+    { id: 'safe', label: '金庫', x: 2, y: 95, w: 36, h: 44, condition: null, action: 'examineSafe' },
+    { id: 'cabinet', label: 'キャビネット', x: 68, y: 37, w: 34, h: 102, condition: null, action: 'examineCabinet' },
   ],
 };
 

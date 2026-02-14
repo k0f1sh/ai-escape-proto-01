@@ -53,11 +53,11 @@ html, body {
   color: var(--text-primary);
 }
 
-/* ---- 9:16 コンテナ ---- */
+/* ---- ゲームコンテナ ---- */
 #game {
-  height: calc(100% - 32px);
-  aspect-ratio: 9 / 16;
-  max-width: calc(100% - 32px);
+  --inv-h: 72px;
+  width: min(calc(100vw - 32px), calc((100vh - 32px - var(--inv-h)) * 9 / 16));
+  width: min(calc(100vw - 32px), calc((100dvh - 32px - var(--inv-h)) * 9 / 16));
   display: flex;
   flex-direction: column;
   background: var(--bg-surface);
@@ -69,12 +69,13 @@ html, body {
     0 24px 80px rgba(0, 0, 0, 0.5);
 }
 
-/* ---- シーン ---- */
+/* ---- シーン（9:16 固定） ---- */
 #scene-container {
-  flex: 1;
   position: relative;
   overflow: hidden;
-  background: var(--bg-card);
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  flex-shrink: 0;
 }
 
 #scene {
@@ -431,8 +432,11 @@ html, body {
 
 /* ---- safe area 対応 ---- */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
+  #game {
+    --inv-h: calc(72px + env(safe-area-inset-bottom));
+  }
   #inventory-bar {
     padding-bottom: env(safe-area-inset-bottom);
-    height: calc(72px + env(safe-area-inset-bottom));
+    height: var(--inv-h);
   }
 }

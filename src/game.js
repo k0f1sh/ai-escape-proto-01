@@ -73,15 +73,11 @@ twInput.addEventListener('keydown', (e) => {
 
 // --- 座標変換 ---
 // data.js の座標は「w=10, h=10 が正方形に見える」仮想グリッド。
-// 実際のコンテナのアスペクト比に合わせて h をピクセル換算で補正する。
-function getHeightRatio() {
-  const rect = sceneEl.getBoundingClientRect();
-  if (rect.height === 0) return 1;
-  return rect.width / rect.height;
-}
+// コンテナは 9:16 固定なので比率も定数で持つ。
+const HEIGHT_RATIO = 9 / 16;
 
 function applyPosition(el, x, y, w, h) {
-  const r = getHeightRatio();
+  const r = HEIGHT_RATIO;
   el.style.left = x + '%';
   el.style.top = (y * r) + '%';
   el.style.width = w + '%';

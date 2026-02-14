@@ -94,7 +94,7 @@ function renderScene() {
   sceneEl.innerHTML = '';
 
   // 背景画像
-  sceneEl.style.backgroundImage = `url(${import.meta.env.BASE_URL}img/rooms/${dir}.png)`;
+  sceneEl.style.backgroundImage = `url(${import.meta.env.BASE_URL}img/rooms/${dir}.webp)`;
   sceneEl.style.backgroundColor = '#1a1a2e';
 
   // ホットスポット描画
@@ -380,9 +380,24 @@ endingRestart.addEventListener('click', () => {
   showMessage('気がつくとオフィスに閉じ込められていた。\nあたりを調べて脱出しよう。');
 });
 
+// --- 画像プリロード ---
+function preloadImages() {
+  return Promise.all(
+    directions.map(dir => new Promise((resolve) => {
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = resolve; // エラーでも止めない
+      img.src = `${import.meta.env.BASE_URL}img/rooms/${dir}.webp`;
+    }))
+  );
+}
+
 // --- 初期化 ---
 export function init() {
-  renderScene();
-  renderInventory();
-  showMessage('気がつくとオフィスに閉じ込められていた。\nあたりを調べて脱出しよう。');
+  showMessage('読み込み中……');
+  preloadImages().then(() => {
+    renderScene();
+    renderInventory();
+    showMessage('気がつくとオフィスに閉じ込められていた。\nあたりを調べて脱出しよう。');
+  });
 }

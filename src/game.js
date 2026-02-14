@@ -146,7 +146,7 @@ function renderInventory() {
 function getItemDescription(itemId) {
   switch (itemId) {
     case 'smallKey': return '小さな鍵を選択した。\nどこかの鍵穴に合いそうだ。';
-    case 'memo': return 'メモを選択した。\nメモにはこう書いてある──\n「パスワード: ESCAPE」';
+    case 'memo': return 'メモを選択した。\nメモにはこう書いてある──\n「答えは壁にある。最後の一語を入力せよ。」';
     case 'screwdriver': return 'ドライバーを選択した。\nネジを外せそうだ。';
     case 'cardKey': return 'カードキーを選択した。\nどこかにかざして使うのだろう。';
     default: return `${items[itemId].name}を選択した。`;
@@ -217,7 +217,7 @@ function examineDrawer() {
     if (!state.flags.memoTaken) {
       state.flags.memoTaken = true;
       addItem('memo');
-      showMessage('引き出しの中にメモがある。\nメモを手に入れた！');
+      showMessage('引き出しの中に古びたメモがある。\nメモを手に入れた！');
     } else {
       showMessage('引き出しは空だ。');
     }
@@ -230,7 +230,7 @@ function examineDrawer() {
     state.flags.memoTaken = true;
     addItem('memo');
     renderScene();
-    showMessage('小さな鍵で引き出しを開けた！\n中にメモが入っている。メモを手に入れた！');
+    showMessage('小さな鍵で引き出しを開けた！\n中に古びたメモが入っている。メモを手に入れた！');
   } else {
     showMessage('引き出しには鍵がかかっている。');
   }
@@ -241,30 +241,26 @@ function examineComputer() {
     showMessage('画面にメッセージが表示されている。\n「時計を見よ」');
     return;
   }
-  if (state.inventory.includes('memo')) {
-    showInput(
-      'PCのログイン画面だ。\nパスワードを入力しよう。',
-      'パスワード',
-      (val) => {
-        if (val.toUpperCase() === 'ESCAPE') {
-          state.flags.computerSolved = true;
-          hideInput();
-          showMessage('ログイン成功！\n画面にメッセージが表示された──\n「時計を見よ」');
-          renderScene();
-        } else {
-          showMessage('パスワードが違うようだ……');
-          hideInput();
-        }
+  showInput(
+    'PCのログイン画面だ。\nパスワードを入力しよう。',
+    'パスワード',
+    (val) => {
+      if (val.toUpperCase() === 'OPEN') {
+        state.flags.computerSolved = true;
+        hideInput();
+        showMessage('ログイン成功！\n画面にメッセージが表示された──\n「時計を見よ」');
+        renderScene();
+      } else {
+        showMessage('パスワードが違うようだ……');
+        hideInput();
       }
-    );
-  } else {
-    showMessage('PCのログイン画面だ。パスワードが必要みたいだ。');
-  }
+    }
+  );
 }
 
 function examineClock() {
   if (state.flags.computerSolved) {
-    showMessage('壁掛け時計。\n針は 3時00分 で止まっている。\n……これがヒントか？');
+    showMessage('壁掛け時計。\n針は 3時00分 で止まっている。');
     state.flags.clockChecked = true;
   } else {
     showMessage('壁掛け時計。3時00分で止まっている。');
@@ -312,6 +308,28 @@ function examineCabinet() {
 }
 
 function examineDoor() {
+  if (state.flags.doorOpen) {
+    showMessage('ドアのロックは解除されている。\n……でもまだ開かない？');
+  } else {
+    showMessage('出口のドアだ。電子ロックがかかっている。');
+  }
+}
+
+function examinePoster() {
+  showMessage('壁に額装されたポスターがある。\n英語でこう書かれている──\n\n"The door to success\n  is always OPEN."');
+}
+
+function examineBookRed() {
+  if (!state.flags.bookChecked) {
+    state.flags.bookChecked = true;
+    showMessage('赤い本を引き抜いてみた。\n……特に何もなかった。\nでも本の間に走り書きが挟まっていた──\n「壁をよく読め」');
+  } else {
+    showMessage('赤い本に挟まっていた走り書き──\n「壁をよく読め」');
+  }
+}
+
+// --- フレーバーテキスト ---
+function examineCardReader() {
   if (state.selectedItem === 'cardKey') {
     state.flags.doorOpen = true;
     state.selectedItem = null;
@@ -322,26 +340,8 @@ function examineDoor() {
       endingOverlay.classList.remove('hidden');
     }, 1500);
   } else {
-    showMessage('出口のドアだ。カードキーが必要みたいだ。');
+    showMessage('ドアの横にカードリーダーがある。\nカードキーをかざす場所のようだ。');
   }
-}
-
-function examinePoster() {
-  showMessage('壁に貼られたポスター。\n「KEEP CALM and ESCAPE」と書いてある。');
-}
-
-function examineBookRed() {
-  if (!state.flags.bookChecked) {
-    state.flags.bookChecked = true;
-    showMessage('赤い本を引き抜いてみた。\n……特に何もなかった。\nでも本の間に挟まっていたメモ書きを見つけた──\n「PCのパスワードはポスターに書いてある」');
-  } else {
-    showMessage('赤い本に挟まっていたメモ書き──\n「PCのパスワードはポスターに書いてある」');
-  }
-}
-
-// --- フレーバーテキスト ---
-function examineCardReader() {
-  showMessage('ドアの横にカードリーダーがある。\nカードキーをかざす場所のようだ。');
 }
 
 function examinePenHolder() {

@@ -243,7 +243,7 @@ function examineDrawer() {
 
 function examineComputer() {
   if (state.flags.computerSolved) {
-    showMessage('画面にメッセージが表示されている。\n「時計を見よ」');
+    showMessage('画面にメッセージが表示されている。\n「時は金なり。金庫の答えは、時計がもう語っている。」');
     return;
   }
   showInput(
@@ -253,7 +253,7 @@ function examineComputer() {
       if (val.toUpperCase() === 'OPEN') {
         state.flags.computerSolved = true;
         hideInput();
-        showMessage('ログイン成功！\n画面にメッセージが表示された──\n「時計を見よ」');
+        showMessage('ログイン成功！\n画面にメッセージが表示された──\n「時は金なり。金庫の答えは、時計がもう語っている。」');
         renderScene();
       } else {
         showMessage('パスワードが違うようだ……');

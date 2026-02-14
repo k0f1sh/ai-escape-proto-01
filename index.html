@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>オフィスからの脱出</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="game">
+    <div id="scene-container">
+      <div id="scene"></div>
+      <button id="arrow-left" class="arrow-btn" aria-label="左を向く">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button id="arrow-right" class="arrow-btn" aria-label="右を向く">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+      <div id="text-window">
+        <span id="text-window-label"></span>
+        <p id="text-window-body"></p>
+        <div id="text-window-input" class="hidden">
+          <input type="text" id="tw-input" autocomplete="off">
+          <button id="tw-submit">決定</button>
+        </div>
+      </div>
+    </div>
+    <div id="inventory-bar">
+      <div id="inventory-label">ITEMS</div>
+      <div id="inventory-slots"></div>
+    </div>
+  </div>
+  <div id="ending-overlay" class="hidden">
+    <div id="ending-content">
+      <p id="ending-sub">CONGRATULATIONS</p>
+      <h1>脱出成功</h1>
+      <p>オフィスからの脱出に成功しました。</p>
+      <button id="ending-restart">PLAY AGAIN</button>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

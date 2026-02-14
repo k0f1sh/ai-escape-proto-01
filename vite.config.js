@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/dasshutu01/',
+  base: '/ai-escape-proto-01/',
 });

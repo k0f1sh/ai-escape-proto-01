@@ -114,6 +114,98 @@ html, body {
   letter-spacing: 0.03em;
 }
 
+/* ---- 方向HUD ---- */
+#compass {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  border: 1px solid var(--border);
+}
+
+#compass-room {
+  width: 36px;
+  height: 36px;
+  position: relative;
+}
+
+.compass-wall {
+  position: absolute;
+  background: var(--text-muted);
+  border-radius: 1px;
+  transition: background 0.2s;
+}
+
+.compass-wall[data-dir="north"],
+.compass-wall[data-dir="south"] {
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.compass-wall[data-dir="east"],
+.compass-wall[data-dir="west"] {
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.compass-wall[data-dir="north"] { top: 0; }
+.compass-wall[data-dir="south"] { bottom: 0; }
+.compass-wall[data-dir="east"] { right: 0; }
+.compass-wall[data-dir="west"] { left: 0; }
+
+.compass-wall.active {
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+#compass-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transition: all 0.2s ease;
+}
+
+#compass-arrow.north {
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid var(--accent);
+}
+
+#compass-arrow.east {
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid var(--accent);
+}
+
+#compass-arrow.south {
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 8px solid var(--accent);
+}
+
+#compass-arrow.west {
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 8px solid var(--accent);
+}
+
 /* ---- 矢印ボタン ---- */
 .arrow-btn {
   position: absolute;

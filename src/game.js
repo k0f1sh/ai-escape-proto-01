@@ -109,8 +109,13 @@ function renderScene() {
     sceneEl.appendChild(el);
   }
 
-  // 方向ラベル更新
+  // 方向ラベル・コンパス更新
   textWindowLabel.textContent = directionLabels[dir];
+  document.querySelectorAll('.compass-wall').forEach(el => {
+    el.classList.toggle('active', el.dataset.dir === dir);
+  });
+  const arrow = document.getElementById('compass-arrow');
+  arrow.className = dir;
 }
 
 // --- インベントリ描画 ---

@@ -339,9 +339,10 @@ body.debug-mode .hotspot-debug .hotspot-hint {
 
 #text-window-input {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 10px;
   margin-top: 10px;
-  align-items: center;
+  align-items: stretch;
 }
 
 #text-window-input.hidden {
@@ -349,40 +350,72 @@ body.debug-mode .hotspot-debug .hotspot-hint {
 }
 
 #tw-input {
-  flex: 1;
-  padding: 8px 12px;
+  width: 100%;
+  padding: 10px 12px;
   font-size: var(--text-base);
   font-family: var(--font);
+  letter-spacing: 0.08em;
   text-align: center;
   border: 1.5px solid var(--border-light);
   border-radius: var(--radius-sm);
   background: rgba(22, 22, 26, 0.9);
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s;
+  user-select: none;
+  pointer-events: none;
 }
 
-#tw-input:focus {
-  border-color: var(--accent);
+#tw-keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-#tw-submit {
-  padding: 8px 20px;
+.tw-key-grid {
+  display: grid;
+  gap: 6px;
+}
+
+#tw-keypad.keypad-pin .tw-key-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#tw-keypad.keypad-password .tw-key-grid {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+
+.tw-key-actions {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tw-key {
+  height: 34px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  font-family: var(--font);
   font-size: var(--text-sm);
   font-weight: 600;
-  font-family: var(--font);
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
   cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.15s ease;
 }
 
-#tw-submit:active {
-  background: var(--accent-hover);
-  transform: scale(0.96);
+.tw-key:active {
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.tw-key-action {
+  background: rgba(124, 106, 239, 0.25);
+  border-color: rgba(124, 106, 239, 0.65);
+}
+
+.tw-key-submit {
+  background: var(--accent);
+  border-color: transparent;
+  color: #fff;
 }
 
 #text-window-label {

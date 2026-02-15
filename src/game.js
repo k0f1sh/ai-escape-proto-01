@@ -28,7 +28,7 @@ const textWindowLabel = document.getElementById('text-window-label');
 const textWindowBody = document.getElementById('text-window-body');
 const textWindowInput = document.getElementById('text-window-input');
 const twInput = document.getElementById('tw-input');
-const twSubmit = document.getElementById('tw-submit');
+const twKeypad = document.getElementById('tw-keypad');
 const inventorySlots = document.getElementById('inventory-slots');
 const arrowLeft = document.getElementById('arrow-left');
 const arrowRight = document.getElementById('arrow-right');
@@ -40,6 +40,9 @@ const itemModalName = document.getElementById('item-modal-name');
 
 // --- 現在の入力コールバック ---
 let inputCallback = null;
+let activeInputConfig = null;
+const PASSWORD_KEYS = '1234567890QWERTYUIOPASDFGHJKLZXCVBNM'.split('');
+const PIN_KEYS = '1234567890'.split('');
 
 // --- メッセージ表示 ---
 function showMessage(text, label) {
@@ -51,33 +54,129 @@ function showMessage(text, label) {
 }
 
 // --- 入力付きメッセージ表示 ---
-function showInput(text, placeholder, callback) {
+function showInput(text, options, callback) {
+  const config = {
+    type: options?.type || 'password',
+    maxLength: options?.maxLength || 20,
+    placeholder: options?.placeholder || '',
+  };
+  config.keys = config.type === 'pin' ? PIN_KEYS : PASSWORD_KEYS;
+
   textWindowBody.textContent = text;
   twInput.value = '';
-  twInput.placeholder = placeholder || '';
-  twInput.maxLength = placeholder === '0000' ? 4 : 20;
-  twInput.inputMode = placeholder === '0000' ? 'numeric' : 'text';
+  twInput.placeholder = config.placeholder;
+  twInput.maxLength = config.maxLength;
+  activeInputConfig = config;
+  renderKeypad(config);
   textWindowInput.classList.remove('hidden');
   inputCallback = callback;
-  setTimeout(() => twInput.focus(), 50);
 }
 
 function hideInput() {
   textWindowInput.classList.add('hidden');
   inputCallback = null;
+  activeInputConfig = null;
   twInput.value = '';
+  twKeypad.innerHTML = '';
+  twKeypad.className = '';
 }
 
-// 入力決定
-twSubmit.addEventListener('click', () => {
+function renderKeypad(config) {
+  twKeypad.innerHTML = '';
+  twKeypad.className = `keypad keypad-${config.type}`;
+
+  const grid = document.createElement('div');
+  grid.className = 'tw-key-grid';
+  for (const key of config.keys) {
+    const keyBtn = document.createElement('button');
+    keyBtn.type = 'button';
+    keyBtn.className = 'tw-key';
+    keyBtn.dataset.key = key;
+    keyBtn.textContent = key;
+    grid.appendChild(keyBtn);
+  }
+  twKeypad.appendChild(grid);
+
+  const actions = document.createElement('div');
+  actions.className = 'tw-key-actions';
+  const actionDefs = [
+    { label: 'C', key: 'CLEAR' },
+    { label: 'DEL', key: 'BACKSPACE' },
+    { label: 'OK', key: 'SUBMIT' },
+  ];
+  for (const action of actionDefs) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `tw-key tw-key-action tw-key-${action.key.toLowerCase()}`;
+    btn.dataset.key = action.key;
+    btn.textContent = action.label;
+    actions.appendChild(btn);
+  }
+  twKeypad.appendChild(actions);
+}
+
+function appendInputChar(char) {
+  if (!activeInputConfig) return;
+  if (twInput.value.length >= activeInputConfig.maxLength) return;
+  twInput.value += char;
+}
+
+function submitInput() {
   if (inputCallback) {
     inputCallback(twInput.value.trim());
   }
+}
+
+function handleInputKey(key) {
+  if (!activeInputConfig) return;
+  if (key === 'CLEAR') {
+    twInput.value = '';
+    return;
+  }
+  if (key === 'BACKSPACE') {
+    twInput.value = twInput.value.slice(0, -1);
+    return;
+  }
+  if (key === 'SUBMIT') {
+    submitInput();
+    return;
+  }
+
+  const char = key.toUpperCase();
+  if (activeInputConfig.type === 'pin') {
+    if (!/^[0-9]$/.test(char)) return;
+  } else if (!/^[A-Z0-9]$/.test(char)) {
+    return;
+  }
+  appendInputChar(char);
+}
+
+twKeypad.addEventListener('click', (e) => {
+  const keyBtn = e.target.closest('button[data-key]');
+  if (!keyBtn || !textWindowInput.contains(keyBtn)) return;
+  handleInputKey(keyBtn.dataset.key);
 });
 
-twInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && inputCallback) {
-    inputCallback(twInput.value.trim());
+window.addEventListener('keydown', (e) => {
+  if (!activeInputConfig || textWindowInput.classList.contains('hidden')) return;
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleInputKey('SUBMIT');
+    return;
+  }
+  if (e.key === 'Backspace') {
+    e.preventDefault();
+    handleInputKey('BACKSPACE');
+    return;
+  }
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    handleInputKey('CLEAR');
+    return;
+  }
+  if (e.key.length === 1) {
+    const char = e.key.toUpperCase();
+    handleInputKey(char);
   }
 });
 
@@ -379,9 +478,9 @@ function examineComputer() {
   }
   showInput(
     'PCのログイン画面だ。\nパスワードを入力しよう。',
-    'パスワード',
+    { type: 'password', placeholder: 'パスワード', maxLength: 12 },
     (val) => {
-      if (val.toUpperCase() === 'OPEN') {
+      if (val === 'OPEN') {
         state.flags.computerSolved = true;
         hideInput();
         showMessage('ログイン成功！\n画面にメッセージが表示された──\n「時は金なり。金庫の答えは、時計がもう語っている。」');
@@ -410,7 +509,7 @@ function examineSafe() {
   }
   showInput(
     '金庫がある。\n4桁の暗証番号を入力しよう。',
-    '0000',
+    { type: 'pin', placeholder: '0000', maxLength: 4 },
     (val) => {
       if (val === '0300') {
         state.flags.safeOpen = true;

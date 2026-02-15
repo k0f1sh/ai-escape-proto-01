@@ -327,9 +327,9 @@ function examinePoster() {
 function examineBookRed() {
   if (!state.flags.bookChecked) {
     state.flags.bookChecked = true;
-    showMessage('赤い本を引き抜いてみた。\n……特に何もなかった。\nでも本の間に走り書きが挟まっていた──\n「壁をよく読め」');
+    showMessage('赤い本の端に小さな走り書きがある──\n「引き出しを開ける鍵は、緑の足元に眠る」');
   } else {
-    showMessage('赤い本に挟まっていた走り書き──\n「壁をよく読め」');
+    showMessage('赤い本の走り書き──\n「引き出しを開ける鍵は、緑の足元に眠る」');
   }
 }
 

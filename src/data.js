@@ -36,8 +36,8 @@ export const hotspots = {
   ],
   west: [
     { id: 'safe', label: '金庫', x: 5.4, y: 100.2, w: 27.5, h: 34, condition: null, action: 'examineSafe' },
-    { id: 'cabinet', label: 'キャビネット', x: 75.3, y: 41.7, w: 24.7, h: 92.1, condition: null, action: 'examineCabinet' },
     { id: 'window', label: '窓', x: 14, y: 22, w: 70.8, h: 46.8, condition: null, action: 'examineWindow' },
+    { id: 'cabinet', label: 'キャビネット', x: 75.3, y: 41.7, w: 24.7, h: 92.1, condition: null, action: 'examineCabinet' },
   ],
 };
 

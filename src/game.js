@@ -27,6 +27,7 @@ const sceneEl = document.getElementById('scene');
 const textWindowLabel = document.getElementById('text-window-label');
 const textWindowBody = document.getElementById('text-window-body');
 const textWindowInput = document.getElementById('text-window-input');
+const twClose = document.getElementById('tw-close');
 const twInput = document.getElementById('tw-input');
 const twKeypad = document.getElementById('tw-keypad');
 const inventorySlots = document.getElementById('inventory-slots');
@@ -171,13 +172,17 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.key === 'Escape') {
     e.preventDefault();
-    handleInputKey('CLEAR');
+    hideInput();
     return;
   }
   if (e.key.length === 1) {
     const char = e.key.toUpperCase();
     handleInputKey(char);
   }
+});
+
+twClose.addEventListener('click', () => {
+  hideInput();
 });
 
 // --- 座標変換 ---
@@ -652,6 +657,9 @@ function preloadImages() {
 
 // --- 初期化 ---
 export function init() {
+  document.addEventListener('gesturestart', (e) => e.preventDefault());
+  document.addEventListener('gesturechange', (e) => e.preventDefault());
+  document.addEventListener('gestureend', (e) => e.preventDefault());
   createDebugPanel();
   showMessage('読み込み中……');
   preloadImages().then(() => {

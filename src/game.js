@@ -1,5 +1,15 @@
 import { directions, directionLabels, hotspots, items } from './data.js';
 
+const DEBUG_MODE = new URLSearchParams(window.location.search).get('debug') === '1';
+const MAX_GRID_Y = 100 / (9 / 16);
+const MIN_SPOT_SIZE = 2;
+const debugHotspots = createDebugHotspots();
+const debugUi = {
+  panel: null,
+  dirLabel: null,
+  output: null,
+};
+
 // --- ゲーム状態 ---
 let state = createInitialState();
 
@@ -76,12 +86,128 @@ twInput.addEventListener('keydown', (e) => {
 // コンテナは 9:16 固定なので比率も定数で持つ。
 const HEIGHT_RATIO = 9 / 16;
 
+function createDebugHotspots() {
+  if (!DEBUG_MODE) return null;
+  return Object.fromEntries(
+    Object.entries(hotspots).map(([dir, spots]) => [dir, spots.map(spot => ({ ...spot }))])
+  );
+}
+
 function applyPosition(el, x, y, w, h) {
   const r = HEIGHT_RATIO;
   el.style.left = x + '%';
   el.style.top = (y * r) + '%';
   el.style.width = w + '%';
   el.style.height = (h * r) + '%';
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function roundCoord(value) {
+  return Math.round(value * 10) / 10;
+}
+
+function formatSpot(spot) {
+  return `    { id: '${spot.id}', label: '${spot.label}', x: ${roundCoord(spot.x)}, y: ${roundCoord(spot.y)}, w: ${roundCoord(spot.w)}, h: ${roundCoord(spot.h)}, condition: null, action: '${spot.action}' },`;
+}
+
+function updateDebugPanel() {
+  if (!DEBUG_MODE || !debugUi.output || !debugUi.dirLabel) return;
+  const dir = directions[state.dirIndex];
+  debugUi.dirLabel.textContent = `dir: ${dir}`;
+  const blocks = directions.map((d) => {
+    const spots = debugHotspots[d] || [];
+    return `${d}: [\n${spots.map(formatSpot).join('\n')}\n],`;
+  });
+  debugUi.output.value = blocks.join('\n');
+}
+
+function createDebugPanel() {
+  if (!DEBUG_MODE || debugUi.panel) return;
+  document.body.classList.add('debug-mode');
+  const panel = document.createElement('aside');
+  panel.id = 'debug-panel';
+  panel.innerHTML = `
+    <div class="debug-panel-head">
+      <strong>DEBUG Hotspots</strong>
+      <span id="debug-current-dir"></span>
+    </div>
+    <p class="debug-panel-help">ドラッグ: 移動 / 右下ハンドル: リサイズ</p>
+    <textarea id="debug-output" readonly></textarea>
+    <button id="debug-copy" type="button">コピー</button>
+  `;
+  document.body.appendChild(panel);
+
+  debugUi.panel = panel;
+  debugUi.dirLabel = panel.querySelector('#debug-current-dir');
+  debugUi.output = panel.querySelector('#debug-output');
+  const copyBtn = panel.querySelector('#debug-copy');
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(debugUi.output.value);
+      copyBtn.textContent = 'コピー済み';
+      setTimeout(() => {
+        copyBtn.textContent = 'コピー';
+      }, 1000);
+    } catch {
+      copyBtn.textContent = '失敗';
+      setTimeout(() => {
+        copyBtn.textContent = 'コピー';
+      }, 1000);
+    }
+  });
+}
+
+function setupDebugSpotInteractions(el, spot) {
+  const resizeHandle = document.createElement('span');
+  resizeHandle.className = 'hotspot-resize-handle';
+  el.appendChild(resizeHandle);
+
+  const beginPointerEdit = (e, mode) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const sceneRect = sceneEl.getBoundingClientRect();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startSpot = { x: spot.x, y: spot.y, w: spot.w, h: spot.h };
+
+    el.setPointerCapture(e.pointerId);
+
+    const onMove = (ev) => {
+      const dxPct = ((ev.clientX - startX) / sceneRect.width) * 100;
+      const dyPct = ((ev.clientY - startY) / sceneRect.height) * 100 / HEIGHT_RATIO;
+
+      if (mode === 'move') {
+        spot.x = clamp(startSpot.x + dxPct, 0, 100 - spot.w);
+        spot.y = clamp(startSpot.y + dyPct, 0, MAX_GRID_Y - spot.h);
+      } else {
+        spot.w = clamp(startSpot.w + dxPct, MIN_SPOT_SIZE, 100 - spot.x);
+        spot.h = clamp(startSpot.h + dyPct, MIN_SPOT_SIZE, MAX_GRID_Y - spot.y);
+      }
+
+      applyPosition(el, spot.x, spot.y, spot.w, spot.h);
+      updateDebugPanel();
+    };
+
+    const onEnd = () => {
+      el.removeEventListener('pointermove', onMove);
+      el.removeEventListener('pointerup', onEnd);
+      el.removeEventListener('pointercancel', onEnd);
+    };
+
+    el.addEventListener('pointermove', onMove);
+    el.addEventListener('pointerup', onEnd);
+    el.addEventListener('pointercancel', onEnd);
+  };
+
+  el.addEventListener('pointerdown', (e) => {
+    if (e.target === resizeHandle) return;
+    beginPointerEdit(e, 'move');
+  });
+  resizeHandle.addEventListener('pointerdown', (e) => beginPointerEdit(e, 'resize'));
 }
 
 // --- シーン描画 ---
@@ -93,13 +219,17 @@ function renderScene() {
   sceneEl.style.backgroundImage = `url(${import.meta.env.BASE_URL}img/rooms/${dir}.webp)`;
 
   // ホットスポット描画
-  const spots = hotspots[dir] || [];
+  const spots = (DEBUG_MODE ? debugHotspots[dir] : hotspots[dir]) || [];
   for (const spot of spots) {
     if (spot.condition && !spot.condition(state.flags)) continue;
     const el = document.createElement('div');
-    el.className = 'hotspot';
+    el.className = DEBUG_MODE ? 'hotspot hotspot-debug' : 'hotspot';
     applyPosition(el, spot.x, spot.y, spot.w, spot.h);
-    el.addEventListener('click', () => handleAction(spot.action));
+    if (DEBUG_MODE) {
+      setupDebugSpotInteractions(el, spot);
+    } else {
+      el.addEventListener('click', () => handleAction(spot.action));
+    }
 
     const hint = document.createElement('span');
     hint.className = 'hotspot-hint';
@@ -116,6 +246,7 @@ function renderScene() {
   });
   const arrow = document.getElementById('compass-arrow');
   arrow.className = dir;
+  updateDebugPanel();
 }
 
 // --- インベントリ描画 ---
@@ -380,22 +511,24 @@ arrowRight.addEventListener('click', () => {
 
 // スワイプ対応
 let touchStartX = 0;
-sceneEl.addEventListener('touchstart', (e) => {
-  touchStartX = e.touches[0].clientX;
-}, { passive: true });
+if (!DEBUG_MODE) {
+  sceneEl.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
 
-sceneEl.addEventListener('touchend', (e) => {
-  const diff = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(diff) > 60) {
-    if (diff > 0) {
-      state.dirIndex = (state.dirIndex + 3) % 4;
-    } else {
-      state.dirIndex = (state.dirIndex + 1) % 4;
+  sceneEl.addEventListener('touchend', (e) => {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(diff) > 60) {
+      if (diff > 0) {
+        state.dirIndex = (state.dirIndex + 3) % 4;
+      } else {
+        state.dirIndex = (state.dirIndex + 1) % 4;
+      }
+      renderScene();
+      hideInput();
     }
-    renderScene();
-    hideInput();
-  }
-});
+  });
+}
 
 // --- リスタート ---
 endingRestart.addEventListener('click', () => {
@@ -420,6 +553,7 @@ function preloadImages() {
 
 // --- 初期化 ---
 export function init() {
+  createDebugPanel();
   showMessage('読み込み中……');
   preloadImages().then(() => {
     renderScene();

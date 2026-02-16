@@ -576,9 +576,7 @@ function examineCardReader() {
     renderScene();
     renderInventory();
     showMessage('カードキーをかざすと、ロックが解除された……！');
-    setTimeout(() => {
-      endingOverlay.classList.remove('hidden');
-    }, 1500);
+    endingOverlay.classList.remove('hidden');
   } else {
     showMessage('ドアの横にカードリーダーがある。\nカードキーをかざす場所のようだ。');
   }
